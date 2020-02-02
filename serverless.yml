@@ -7,6 +7,9 @@ service: serverless-workspace
 # Check out our docs for more details
 # frameworkVersion: "=X.X.X"
 
+plugins:
+  - serverless-step-functions
+
 provider:
   name: aws
   runtime: python3.8
@@ -57,10 +60,23 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  sample-func:
-    handler: handler.main
-    events:
-      - schedule: cron(0 19 * * ? *)
+  Function1:
+    name: TestFunction
+    handler: handler.post_slack 
+
+stepFunctions:
+  stateMachines:
+    stateMachine1:
+      name: TestStateMachine
+      definition:
+        StartAt: HelloWorld
+        States:
+          HelloWorld:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [Function1LambdaFunction, Arn]
+            End: true
+              
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
